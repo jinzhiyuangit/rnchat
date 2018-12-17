@@ -1,0 +1,3 @@
+rootProject.name = 'RNChatkit'
+
+include ':app'
