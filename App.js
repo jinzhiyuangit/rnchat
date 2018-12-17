@@ -1,14 +1,14 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
-import { ChatManager, TokenProvider } from "@pusher/chatkit";
+import { ChatManager, TokenProvider } from "@pusher/chatkit-client";
 
 import Login from "./app/screens/Login";
 import Users from "./app/screens/Users";
 import Chat from "./app/screens/Chat";
 
-const instanceLocatorId = "YOUR INSTANCE LOCATOR ID";
-const presenceRoomId = YOUR_GENERAL_ROOM_ID; // room ID of the general room created through the chatKit inspector
-const chatServer = "http://YOUR_INTERNAL_IP:3000/users";
+const instanceLocatorId = "d6b422d1-6fd4-4271-8953-4bd711965dbd";
+const presenceRoomId = "19375885"; // room ID of the general room created through the chatKit inspector
+const chatServer = "http://salt.intviu.cn:3000/users";
 
 const tokenProvider = new TokenProvider({
   url: `https://us1.pusherplatform.io/services/chatkit_token_provider/v1/${instanceLocatorId}/token`
@@ -83,6 +83,7 @@ export default class App extends React.Component {
   };
 
   enterChat = () => {
+    //console.log("start create user finish. send a request to nodeserver");
     fetch(chatServer, {
       method: "POST",
       headers: {
@@ -91,63 +92,65 @@ export default class App extends React.Component {
       body: JSON.stringify({
         username: this.state.username
       })
-    })
-      .then(response => {
+    }).then(response => {
+        //console.log("create user finish. get a response from nodeserver");
         this.chatManager = new ChatManager({
           instanceLocator: `v1:us1:${instanceLocatorId}`,
           userId: this.state.username,
           tokenProvider
         });
-
+        //console.log("create chatManager finish.");
         this.chatManager
           .connect()
-          .then(currentUser => {
-            this.currentUser = currentUser;
+          .then(
+            currentUser => {
+              this.currentUser = currentUser;
+              //console.log("connect chatManager finish.");
+              this.setState({
+                presenceRoomId: presenceRoomId
+              });
 
-            this.setState({
-              presenceRoomId: presenceRoomId
-            });
+              currentUser
+                .subscribeToRoom({
+                  roomId: presenceRoomId,
+                  hooks: {
+                    onUserCameOnline: this.handleInUser,
+                    onUserJoinedRoom: this.handleInUser,
+                    onUserLeftRoom: this.handleOutUser,
+                    onUserWentOffline: this.handleOutUser
+                  }
+                })
+                .then(room => {
+                  //console.log("subscribeToRoom finish.");
+                  let new_users = [];
+                  room.users.forEach(user => {
+                    if (user.id != this.currentUser.id) {
+                      let is_online =
+                        user.presence.state == "online" ? true : false;
 
-            currentUser
-              .subscribeToRoom({
-                roomId: presenceRoomId,
-                hooks: {
-                  onUserCameOnline: this.handleInUser,
-                  onUserJoinedRoom: this.handleInUser,
-                  onUserLeftRoom: this.handleOutUser,
-                  onUserWentOffline: this.handleOutUser
-                }
-              })
-              .then(room => {
-                let new_users = [];
-                room.users.forEach(user => {
-                  if (user.id != this.currentUser.id) {
-                    let is_online =
-                      user.presence.state == "online" ? true : false;
-
-                    new_users.push({
+                      new_users.push({
                       id: user.id,
                       name: user.name,
                       is_online
-                    });
-                  }
-                });
+                      });
+                    }
+                  });
 
-                this.setState({
-                  userHasLoggedIn: true,
-                  users: new_users
+                  this.setState({
+                    userHasLoggedIn: true,
+                    users: new_users
+                  });
+                })
+                .catch(err => {
+                  console.log(`Error joining room ${err}`);
                 });
-              })
-              .catch(err => {
-                console.log(`Error joining room ${err}`);
-              });
           })
           .catch(error => {
             console.log("error with chat manager", error);
           });
       })
       .catch(error => {
-        console.log("error in request: ");
+        console.log("error in request: ", error);
       });
 
     this.setState({
