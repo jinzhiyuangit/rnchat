@@ -294,7 +294,8 @@ export default class App extends React.Component {
       .subscribeToRoom({
         roomId: roomId,
         hooks: {
-          onNewMessage: this.onReceiveMessage,
+          //onNewMessage: this.onReceiveMessage,
+          onMessage: this.onReceiveMessage,
           onUserStartedTyping: this.onUserTypes,
           onUserStoppedTyping: this.onUserNotTypes
         },
