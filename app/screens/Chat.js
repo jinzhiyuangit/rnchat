@@ -134,7 +134,6 @@ const styles = StyleSheet.create({
   current_user_username: {
     opacity: 0,
   },
-
   other_user_msg: {
     backgroundColor: '#f6f8fa',
     alignSelf: 'flex-start',

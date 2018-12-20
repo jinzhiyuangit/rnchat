@@ -101,7 +101,20 @@ export default class App extends React.Component {
         });
         //console.log("create chatManager finish.");
         this.chatManager
-          .connect()
+          .connect({ 
+            onAddedToRoom: room => {
+              console.log(`Added to room ${room.name}`)
+            },
+            onRemovedFromRoom: room => {
+              console.log(`currentuser removed from room ${room.name}`)
+            },
+            onRoomUpdated: room => {
+              console.log(`the room was updated ${room.name}`)
+            },
+            onRoomDeleted: room => {
+              console.log(`delete the room ${room.name}`)
+            }
+          })
           .then(
             currentUser => {
               this.currentUser = currentUser;
@@ -114,10 +127,28 @@ export default class App extends React.Component {
                 .subscribeToRoom({
                   roomId: presenceRoomId,
                   hooks: {
-                    onUserCameOnline: this.handleInUser,
-                    onUserJoinedRoom: this.handleInUser,
-                    onUserLeftRoom: this.handleOutUser,
-                    onUserWentOffline: this.handleOutUser
+                    //onUserCameOnline: this.handleInUser,
+                    //onUserJoinedRoom: this.handleInUser,
+                    //onUserLeftRoom: this.handleOutUser,
+                    //onUserWentOffline: this.handleOutUser
+                    onMessage: message => {
+                      console.log(`get a new message ${message.text}`);
+                    },
+                    onUserStartedTyping: user => {
+                      console.log(`user start typing ${user.name}`);
+                    },
+                    onUserStoppedTyping: user => {
+                      console.log(`user stop typing ${user.name}`);
+                    },
+                    onUserJoined: user => {
+                      console.log(`user joined this room ${user.name}`);
+                    },
+                    onUserLeft: user => {
+                      console.log(`user left this room ${user.name}`);
+                    },
+                    onPresenceChanged: (state, user) => {
+                      console.log(`user ${user.name}, changed status to ${state.current}`);
+                    }
                   }
                 })
                 .then(room => {
@@ -241,13 +272,13 @@ export default class App extends React.Component {
               private: false // so they could find it in joinable rooms
             })
             .then(room => {
-              this.subscribeToRoom(room.id, user.id);
+              this.substheRoom(room.id, user.id);
             })
             .catch(err => {
               console.log(`error creating room ${err}`);
             });
         } else {
-          this.subscribeToRoom(chat_room.id, user.id);
+          this.substheRoom(chat_room.id, user.id);
         }
       })
       .catch(err => {
@@ -255,7 +286,7 @@ export default class App extends React.Component {
       });
   };
 
-  subscribeToRoom = (roomId, chatWith) => {
+  substheRoom = (roomId, chatWith) => {
     this.roomId = roomId;
     this.chatWithUser = chatWith;
 
