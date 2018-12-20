@@ -18,7 +18,7 @@ export default class Chat extends React.Component {
     const { refreshing = false } = this.props;
 
     return (
-      <KeyboardAvoidingView style={styles.container} behavior="padding" enabled>
+      <KeyboardAvoidingView style={styles.container} enabled>
         <Header text={this.props.chatWithUser}>
           {this.props.inChatRoom && (
             <TouchableOpacity onPress={this.props.backToUsers}>
