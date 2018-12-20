@@ -166,7 +166,7 @@ export default class App extends React.Component {
                       });
                     }
                   });
-
+                  console.log(`the users is null ? ${new_users.length}`);
                   this.setState({
                     userHasLoggedIn: true,
                     users: new_users
