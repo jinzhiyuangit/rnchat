@@ -23,7 +23,7 @@ export default class Login extends React.Component {
           <TextInput
             style={styles.text_field}
             onChangeText={this.props.updatePassword}
-            value={this.props.password}
+            value={this.props.username}
             placeholder="Enter your password"
           />
         </View>

@@ -2,6 +2,14 @@ import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { ChatManager, TokenProvider } from "@pusher/chatkit-client";
 
+import {Provider, connect} from "react-redux";
+import store from './app/store/store.js';
+import AppStore from './app/store/AppStore.js';
+import CounterContainer from './app/containers/CounterContainer.js';
+import LoginContainer from './app/containers/LoginContainer.js';
+import LoginState from './app/reducers/LoginReducer'
+
+
 import Login from "./app/screens/Login";
 import Users from "./app/screens/Users";
 import Chat from "./app/screens/Chat";
@@ -27,7 +35,7 @@ export default class App extends React.Component {
     messages: [],
     chatWithUserIsTyping: false,
     refreshing: false,
-    inChatRoom: false
+    inChatRoom: false,
   };
 
   constructor(props) {
@@ -36,17 +44,15 @@ export default class App extends React.Component {
     this.roomId = null;
     this.chatWithUser = null;
   }
-
+  
   render() {
     return (
       <View style={styles.container}>
-        {this.state.currentScreen == "login" && (
-          <Login
-            username={this.state.username}
-            updateUsername={this.updateUsername}
-            enterChat={this.enterChat}
-          />
-        )}
+        <Provider store={AppStore}>
+          <View style={styles.container_redux}>
+            <LoginContainer/>
+          </View>
+        </Provider>
 
         {this.state.currentScreen == "users" && (
           <Users
@@ -55,6 +61,14 @@ export default class App extends React.Component {
             beginChat={this.beginChat}
             leavePresenceRoom={this.leavePresenceRoom}
           />
+        )}
+        
+        {this.state.currentScreen == "redux" && (
+          <Provider store={AppStore}>
+            <View style={styles.container_redux}>
+              <CounterContainer/>
+            </View>
+          </Provider>
         )}
 
         {this.state.currentScreen == "chat" && (
@@ -82,7 +96,7 @@ export default class App extends React.Component {
     });
   };
 
-  enterChat = () => {
+ /* enterChat = () => {
     //console.log("start create user finish. send a request to nodeserver");
     fetch(chatServer, {
       method: "POST",
@@ -101,7 +115,7 @@ export default class App extends React.Component {
         });
         //console.log("create chatManager finish.");
         this.chatManager
-          .connect({ 
+          .connect({
             onAddedToRoom: room => {
               console.log(`Added to room ${room.name}`)
             },
@@ -185,10 +199,11 @@ export default class App extends React.Component {
       });
 
     this.setState({
-      currentScreen: "users"
+      //currentScreen: "users"
+      currentScreen: "redux"
     });
   };
-
+*/
   handleInUser = user => {
     let currentUsers = [...this.state.users];
     let userIndex = currentUsers.findIndex(item => item.id == user.id);
@@ -449,6 +464,11 @@ export default class App extends React.Component {
 }
 
 const styles = StyleSheet.create({
+  container_redux: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   container: {
     flex: 1,
     backgroundColor: "#fff",
