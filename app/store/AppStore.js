@@ -1,7 +1,7 @@
 import { createStore } from 'redux'
-import LoginState from '../reducers/LoginReducer'
+import reducer from '../reducers'
 
 
-let AppStore = createStore(LoginState);
+let AppStore = createStore(reducer);
 
 export default AppStore;

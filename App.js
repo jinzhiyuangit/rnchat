@@ -3,15 +3,11 @@ import { StyleSheet, Text, View } from "react-native";
 import { ChatManager, TokenProvider } from "@pusher/chatkit-client";
 
 import {Provider, connect} from "react-redux";
-import store from './app/store/store.js';
 import AppStore from './app/store/AppStore.js';
 import CounterContainer from './app/containers/CounterContainer.js';
 import LoginContainer from './app/containers/LoginContainer.js';
-import LoginState from './app/reducers/LoginReducer'
+import UsersContainer from './app/containers/UsersContainer.js';
 
-
-import Login from "./app/screens/Login";
-import Users from "./app/screens/Users";
 import Chat from "./app/screens/Chat";
 
 const instanceLocatorId = "d6b422d1-6fd4-4271-8953-4bd711965dbd";
@@ -49,20 +45,28 @@ export default class App extends React.Component {
     return (
       <View style={styles.container}>
         <Provider store={AppStore}>
+        {AppStore.getState().currentScreen != "users" && 
+          AppStore.getState().currentScreen != "chat" && (
           <View style={styles.container_redux}>
             <LoginContainer/>
           </View>
+        )}
+        {AppStore.getState().currentScreen == "users" &&
+          console.log(`the currentuser is ${AppStore.getState().currentScreen}`) && (
+          <View>
+            <UsersContainer/>
+          </View>
+        )}
         </Provider>
-
-        {this.state.currentScreen == "users" && (
+        {/*this.state.currentScreen == "users" && (
           <Users
             userHasLoggedIn={this.state.userHasLoggedIn}
             users={this.sortUsers(this.state.users)}
             beginChat={this.beginChat}
             leavePresenceRoom={this.leavePresenceRoom}
           />
-        )}
-        
+        )*/}
+
         {this.state.currentScreen == "redux" && (
           <Provider store={AppStore}>
             <View style={styles.container_redux}>
@@ -269,7 +273,7 @@ export default class App extends React.Component {
       });
   };
 
-  beginChat = user => {
+  /*beginChat = user => {
     let roomName = [user.id, this.currentUser.id];
     roomName = roomName.sort().join("_") + "_room";
 
@@ -299,7 +303,7 @@ export default class App extends React.Component {
       .catch(err => {
         console.log(`error getting joinable rooms: ${err}`);
       });
-  };
+  };*/
 
   substheRoom = (roomId, chatWith) => {
     this.roomId = roomId;
@@ -367,7 +371,7 @@ export default class App extends React.Component {
     });
   };
 
-  leavePresenceRoom = () => {
+ /* leavePresenceRoom = () => {
     this.currentUser
       .leaveRoom({ roomId: this.state.presenceRoomId })
       .then(room => {
@@ -386,6 +390,7 @@ export default class App extends React.Component {
         );
       });
   };
+*/
 
   updateMessage = message => {
     this.setState({
