@@ -127,10 +127,6 @@ export default class App extends React.Component {
                 .subscribeToRoom({
                   roomId: presenceRoomId,
                   hooks: {
-                    //onUserCameOnline: this.handleInUser,
-                    //onUserJoinedRoom: this.handleInUser,
-                    //onUserLeftRoom: this.handleOutUser,
-                    //onUserWentOffline: this.handleOutUser
                     onMessage: message => {
                       console.log(`get a new message ${message.text}`);
                     },
@@ -152,7 +148,6 @@ export default class App extends React.Component {
                   }
                 })
                 .then(room => {
-                  //console.log("subscribeToRoom finish.");
                   let new_users = [];
                   room.users.forEach(user => {
                     if (user.id != this.currentUser.id) {
